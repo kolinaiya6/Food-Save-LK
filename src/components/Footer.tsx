@@ -140,7 +140,7 @@ export const Footer: React.FC<FooterProps> = ({
                 className="flex items-center gap-1.5 text-[11px] text-slate-400 hover:text-emerald-400 transition-colors cursor-pointer"
               >
                 <Database className="w-3.5 h-3.5" />
-                <span>Supabase Database මාර්ගෝපදේශය</span>
+                <span>දත්ත ගබඩා සහ SQL සැකසුම්</span>
               </button>
             </div>
           </div>

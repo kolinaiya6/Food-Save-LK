@@ -46,23 +46,23 @@ export const Navbar: React.FC<NavbarProps> = ({
 
   return (
     <>
-      {/* Top Notification / Demo Mode Bar */}
+      {/* Top Notification Bar - Zero login details exposed, zero Supabase text */}
       <aside aria-label="පද්ධති දැනුම්දීම" className="bg-emerald-950 text-emerald-100 px-4 py-1.5 text-xs flex flex-wrap items-center justify-between border-b border-emerald-900/60">
         <div className="flex items-center gap-2">
-          <span className="font-medium text-emerald-400">මුදල් ගෙවීම:</span>
+          <span className="font-semibold text-emerald-400">මුදල් ගෙවීම:</span>
           <span>කඩේට ගිය පසු එහිදී මුදල් ගෙවන්න (Online Card අවශ්‍ය නැත)</span>
         </div>
         <div className="flex items-center gap-3">
           <div className="flex items-center gap-2">
             <button
               onClick={onOpenSetupGuide}
-              className="flex items-center gap-1.5 text-xs text-amber-300 hover:text-amber-200 transition-colors cursor-pointer"
-              title="Supabase Database Settings"
+              className="flex items-center gap-1.5 text-xs text-emerald-300 hover:text-emerald-100 transition-colors cursor-pointer"
+              title="දත්ත ගබඩා තත්ත්වය සහ SQL සැකසුම්"
             >
               <Database className="w-3.5 h-3.5 text-emerald-400" />
               <span className="flex items-center gap-1">
                 <span className="inline-block w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-                <span>Supabase Live</span>
+                <span>සජීවීව සම්බන්ධයි</span>
               </span>
             </button>
 
@@ -76,19 +76,39 @@ export const Navbar: React.FC<NavbarProps> = ({
               <RefreshCw className={`w-3.5 h-3.5 ${storage.isSyncing() ? 'animate-spin text-amber-400' : ''}`} />
             </button>
           </div>
+
           <span className="text-emerald-800">|</span>
-          <div className="flex items-center gap-1 text-xs">
-            <span className="text-slate-400">ක්‍රියාකාරී ගිණුම:</span>
-            <select
-              value={currentRole}
-              onChange={(e) => onSwitchRole(e.target.value as UserRole)}
-              className="bg-emerald-900 text-emerald-200 text-xs rounded px-1.5 py-0.5 border border-emerald-800 focus:outline-none cursor-pointer"
-            >
-              <option value="customer">පාරිභෝගිකයා (Customer)</option>
-              <option value="merchant">වෙළඳසැල (Merchant)</option>
-              <option value="admin">පරිපාලක (Admin)</option>
-            </select>
-          </div>
+
+          {/* Discrete Portal Navigation without exposing credentials */}
+          {currentRole !== 'customer' ? (
+            <div className="flex items-center gap-2">
+              <span className="text-amber-400 font-semibold bg-emerald-900/80 px-2 py-0.5 rounded text-[11px]">
+                {currentRole === 'admin' ? 'පරිපාලක ප්‍රකාරය' : 'වෙළඳසැල් ප්‍රකාරය'}
+              </span>
+              <button
+                onClick={() => onSwitchRole('customer')}
+                className="text-emerald-200 hover:text-white text-[11px] underline cursor-pointer"
+              >
+                පාරිභෝගික මුහුණතට
+              </button>
+            </div>
+          ) : (
+            <div className="flex items-center gap-2 text-xs">
+              <button
+                onClick={() => onSwitchRole('merchant')}
+                className="text-emerald-300 hover:text-white transition-colors cursor-pointer text-[11px]"
+              >
+                වෙළඳසැල් පිවිසුම
+              </button>
+              <span className="text-emerald-800">·</span>
+              <button
+                onClick={() => onSwitchRole('admin')}
+                className="text-emerald-300 hover:text-white transition-colors cursor-pointer text-[11px]"
+              >
+                පරිපාලක
+              </button>
+            </div>
+          )}
         </div>
       </aside>
 
@@ -280,28 +300,34 @@ export const Navbar: React.FC<NavbarProps> = ({
               ඔබේ කඩය ලියාපදිංචි කරන්න
             </button>
 
-            <div className="pt-2 border-t border-slate-100 flex items-center justify-between">
-              <span className="text-xs text-slate-500">ගිණුම් වර්ගය:</span>
-              <div className="flex gap-2">
+            <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500">
+              {currentRole !== 'customer' ? (
                 <button
                   onClick={() => { onSwitchRole('customer'); setMobileMenuOpen(false); }}
-                  className={`text-xs px-2.5 py-1 rounded ${currentRole === 'customer' ? 'bg-emerald-600 text-white' : 'bg-slate-100 text-slate-700'}`}
+                  className="text-emerald-700 font-semibold underline"
                 >
-                  පාරිභෝගික
+                  පාරිභෝගික මුහුණතට ආපසු යන්න
                 </button>
-                <button
-                  onClick={() => { onSwitchRole('merchant'); setMobileMenuOpen(false); }}
-                  className={`text-xs px-2.5 py-1 rounded ${currentRole === 'merchant' ? 'bg-emerald-600 text-white' : 'bg-slate-100 text-slate-700'}`}
-                >
-                  වෙළඳසැල්
-                </button>
-                <button
-                  onClick={() => { onSwitchRole('admin'); setMobileMenuOpen(false); }}
-                  className={`text-xs px-2.5 py-1 rounded ${currentRole === 'admin' ? 'bg-slate-900 text-white' : 'bg-slate-100 text-slate-700'}`}
-                >
-                  පරිපාලක
-                </button>
-              </div>
+              ) : (
+                <div className="flex items-center gap-3 w-full justify-between">
+                  <span>ද්වාර පිවිසුම:</span>
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => { onSwitchRole('merchant'); setMobileMenuOpen(false); }}
+                      className="text-xs text-slate-600 hover:text-emerald-700 underline"
+                    >
+                      වෙළඳසැල
+                    </button>
+                    <span>·</span>
+                    <button
+                      onClick={() => { onSwitchRole('admin'); setMobileMenuOpen(false); }}
+                      className="text-xs text-slate-600 hover:text-emerald-700 underline"
+                    >
+                      පරිපාලක
+                    </button>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         )}

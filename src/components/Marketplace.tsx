@@ -140,7 +140,7 @@ export const Marketplace: React.FC<MarketplaceProps> = ({
                   : 'bg-white text-slate-700 hover:bg-slate-100 border border-slate-200'
               }`}
             >
-              සියලුම වර්ග
+              සියලුම වර්ග ({categories.length})
             </button>
             {categories.map((cat) => (
               <button
@@ -157,6 +157,74 @@ export const Marketplace: React.FC<MarketplaceProps> = ({
             ))}
           </div>
 
+          {/* Special Quick Budget Filter: Cheapest Foods */}
+          <div className="mt-3 flex flex-wrap items-center gap-2">
+            <span className="text-xs font-bold text-slate-600 mr-1 flex items-center gap-1">
+              <span>අඩුම මිල පෙරහන්:</span>
+            </span>
+            <button
+              onClick={() => {
+                setMaxPrice(300);
+                setSortBy('price_low');
+              }}
+              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 shadow-2xs ${
+                maxPrice === 300 && sortBy === 'price_low'
+                  ? 'bg-amber-500 text-slate-950 font-black ring-2 ring-amber-400'
+                  : 'bg-amber-100 text-amber-900 hover:bg-amber-200 border border-amber-300'
+              }`}
+            >
+              <span>🔥 අඩුම මිලැති ආහාර (රු. 300 ට අඩු)</span>
+            </button>
+
+            <button
+              onClick={() => {
+                setMaxPrice(200);
+                setSortBy('price_low');
+              }}
+              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 shadow-2xs ${
+                maxPrice === 200 && sortBy === 'price_low'
+                  ? 'bg-emerald-600 text-white font-black ring-2 ring-emerald-400'
+                  : 'bg-emerald-100 text-emerald-900 hover:bg-emerald-200 border border-emerald-300'
+              }`}
+            >
+              <span>⚡ සුපිරි ලාභදායී (රු. 200 ට අඩු)</span>
+            </button>
+
+            <button
+              onClick={() => setSortBy('price_low')}
+              className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all cursor-pointer ${
+                sortBy === 'price_low' && maxPrice > 300
+                  ? 'bg-slate-800 text-white'
+                  : 'bg-white text-slate-700 hover:bg-slate-100 border border-slate-200'
+              }`}
+            >
+              <span>අඩුම මිලෙන් මුලින්</span>
+            </button>
+
+            <button
+              onClick={() => setSortBy('discount_high')}
+              className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all cursor-pointer ${
+                sortBy === 'discount_high'
+                  ? 'bg-slate-800 text-white'
+                  : 'bg-white text-slate-700 hover:bg-slate-100 border border-slate-200'
+              }`}
+            >
+              <span>වැඩිම වට්ටම් (70% දක්වා)</span>
+            </button>
+
+            {(maxPrice < 3000 || sortBy !== 'default') && (
+              <button
+                onClick={() => {
+                  setMaxPrice(3000);
+                  setSortBy('default');
+                }}
+                className="px-2.5 py-1 text-[11px] text-slate-500 hover:text-slate-800 underline cursor-pointer"
+              >
+                සියලු මිල ගණන්
+              </button>
+            )}
+          </div>
+
           {/* Secondary Filter Bar: City & Sorting */}
           <div className="mt-4 p-3 bg-white rounded-xl border border-slate-200 flex flex-wrap items-center justify-between gap-4 text-xs">
             <div className="flex flex-wrap items-center gap-3">
@@ -170,7 +238,7 @@ export const Marketplace: React.FC<MarketplaceProps> = ({
                   onChange={(e) => setSelectedCity(e.target.value)}
                   className="bg-slate-50 border border-slate-200 text-slate-800 font-semibold rounded-lg px-2.5 py-1.5 focus:outline-none focus:ring-1 focus:ring-emerald-500 cursor-pointer"
                 >
-                  <option value="all">සියලුම නගර</option>
+                  <option value="all">සියලුම නගර ({cities.length})</option>
                   {cities.map((city) => (
                     <option key={city.id} value={city.name}>
                       {city.name}
@@ -185,9 +253,9 @@ export const Marketplace: React.FC<MarketplaceProps> = ({
                 <span className="font-mono font-bold text-emerald-700">රු. {maxPrice}</span>
                 <input
                   type="range"
-                  min="300"
+                  min="90"
                   max="3000"
-                  step="50"
+                  step="10"
                   value={maxPrice}
                   onChange={(e) => setMaxPrice(Number(e.target.value))}
                   className="w-24 accent-emerald-600 cursor-pointer"
@@ -205,12 +273,12 @@ export const Marketplace: React.FC<MarketplaceProps> = ({
                 className="bg-slate-50 border border-slate-200 text-slate-800 font-semibold rounded-lg px-2.5 py-1.5 focus:outline-none cursor-pointer"
               >
                 <option value="default">පෙරනිමි</option>
-                <option value="price_low">අඩුම මිලෙන්</option>
-                <option value="discount_high">වැඩිම වට්ටමෙන්</option>
+                <option value="price_low">අඩුම මිලෙන් (Cheapest First)</option>
+                <option value="discount_high">වැඩිම වට්ටමෙන් (% Off)</option>
                 <option value="stock">වැඩිම තොග ප්‍රමාණයෙන්</option>
               </select>
 
-              {(selectedCity !== 'all' || selectedCategory !== 'all' || searchQuery || maxPrice < 3000) && (
+              {(selectedCity !== 'all' || selectedCategory !== 'all' || searchQuery || maxPrice < 3000 || sortBy !== 'default') && (
                 <button
                   onClick={resetFilters}
                   className="p-1.5 text-slate-400 hover:text-slate-700 hover:bg-slate-100 rounded-lg transition-colors cursor-pointer"

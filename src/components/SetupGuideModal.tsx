@@ -232,10 +232,10 @@ ON CONFLICT (id) DO UPDATE SET public = true;
             </div>
             <div>
               <h3 className="text-base font-bold text-slate-900">
-                Supabase Cloud Database සක්‍රීය කිරීම
+                වලාකුළු දත්ත ගබඩාව (Cloud Database) සක්‍රීය කිරීම
               </h3>
               <p className="text-xs text-slate-500">
-                Project: <span className="font-mono text-emerald-700 font-bold">gmtzbwgbgodrfzvmlimd</span>
+                Project Ref: <span className="font-mono text-emerald-700 font-bold">gmtzbwgbgodrfzvmlimd</span>
               </p>
             </div>
           </div>
@@ -255,7 +255,7 @@ ON CONFLICT (id) DO UPDATE SET public = true;
               <div className="w-3 h-3 rounded-full bg-emerald-600 mt-1 shrink-0" />
               <div>
                 <p className="text-xs font-bold">
-                  ඔබේ Supabase Project එක සකසා ඇත!
+                  වලාකුළු දත්ත ගබඩාව (Cloud Database) සකසා ඇත!
                 </p>
                 <p className="text-[11px] text-slate-600 mt-0.5 leading-relaxed">
                   URL: <span className="font-mono text-emerald-800 font-semibold">{url}</span>
@@ -289,7 +289,7 @@ ON CONFLICT (id) DO UPDATE SET public = true;
               <div className="flex items-center gap-2">
                 <Terminal className="w-4 h-4 text-emerald-400" />
                 <h4 className="text-xs font-bold text-white uppercase tracking-wider">
-                  Complete Drop-In Supabase SQL Migration
+                  සම්පූර්ණ ක්‍රියාකාරී SQL Migration Script එක
                 </h4>
               </div>
 
@@ -307,7 +307,7 @@ ON CONFLICT (id) DO UPDATE SET public = true;
             </p>
             <ul className="text-xs text-slate-300 space-y-1 list-disc list-inside">
               <li>සියලුම Tables (profiles, stores, food_deals, reservations, vouchers, reviews ආදී)</li>
-              <li>පින්තූර අප්ලෝඩ් කිරීම සඳහා Supabase Storage Buckets (food-images, store-images)</li>
+              <li>පින්තූර අප්ලෝඩ් කිරීම සඳහා Cloud Storage Buckets (food-images, store-images)</li>
               <li>ශ්‍රී ලංකාවේ සියලුම දිස්ත්‍රික්ක සහ නගර 42 ක දත්ත (Cities)</li>
               <li>කඩවල සම්පූර්ණ ලිපින, දුරකථන සහ ආරම්භක ආහාර පැකේජ</li>
               <li>තොග ඉක්මවා යාම වළක්වන Atomic Function සහ Realtime Sync</li>
@@ -321,7 +321,7 @@ ON CONFLICT (id) DO UPDATE SET public = true;
                 rel="noreferrer"
                 className="text-emerald-400 hover:text-emerald-300 flex items-center gap-1 underline font-semibold"
               >
-                <span>Supabase SQL Editor එක විවෘත කරන්න</span>
+                <span>SQL Editor එක විවෘත කරන්න</span>
                 <ExternalLink className="w-3 h-3" />
               </a>
             </div>
