@@ -97,6 +97,14 @@ export const Footer: React.FC<FooterProps> = ({
                   ඔබේ කඩය ලියාපදිංචි කරන්න
                 </button>
               </li>
+              <li>
+                <button
+                  onClick={() => onNavigate('admin')}
+                  className="text-slate-500 hover:text-slate-300 transition-colors cursor-pointer text-[11px]"
+                >
+                  පරිපාලක පිවිසුම
+                </button>
+              </li>
             </ul>
           </div>
 

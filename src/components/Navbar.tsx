@@ -23,10 +23,13 @@ interface NavbarProps {
   setSelectedCity: (city: string) => void;
   cities: CityLocation[];
   currentRole: UserRole;
+  isAdminAuthenticated: boolean;
   onSwitchRole: (role: UserRole) => void;
   onOpenStoreRegister: () => void;
   onOpenSetupGuide: () => void;
   onOpenAuthModal: () => void;
+  onOpenAdminLogin: () => void;
+  onAdminLogout: () => void;
 }
 
 export const Navbar: React.FC<NavbarProps> = ({
@@ -36,10 +39,13 @@ export const Navbar: React.FC<NavbarProps> = ({
   setSelectedCity,
   cities,
   currentRole,
+  isAdminAuthenticated,
   onSwitchRole,
   onOpenStoreRegister,
   onOpenSetupGuide,
-  onOpenAuthModal
+  onOpenAuthModal,
+  onOpenAdminLogin,
+  onAdminLogout
 }) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const isSupabaseReady = isSupabaseConfigured();
@@ -79,11 +85,32 @@ export const Navbar: React.FC<NavbarProps> = ({
 
           <span className="text-emerald-800">|</span>
 
-          {/* Discrete Portal Navigation without exposing credentials */}
-          {currentRole !== 'customer' ? (
+          {/* Admin status & portal navigation */}
+          {isAdminAuthenticated ? (
+            <div className="flex items-center gap-2">
+              <span className="text-emerald-200 font-semibold bg-emerald-900/90 border border-emerald-700/60 px-2 py-0.5 rounded text-[11px] flex items-center gap-1">
+                <ShieldCheck className="w-3 h-3 text-emerald-400" />
+                <span>පරිපාලක (kolinaiya6)</span>
+              </span>
+              <button
+                onClick={() => setCurrentTab('admin')}
+                className={`text-[11px] px-2 py-0.5 rounded font-semibold transition-all cursor-pointer ${
+                  currentTab === 'admin' ? 'bg-amber-400 text-slate-950' : 'text-amber-300 hover:text-white'
+                }`}
+              >
+                පාලක පුවරුව
+              </button>
+              <button
+                onClick={onAdminLogout}
+                className="text-red-300 hover:text-red-100 text-[11px] underline cursor-pointer"
+              >
+                ඉවත් වීම
+              </button>
+            </div>
+          ) : currentRole === 'merchant' ? (
             <div className="flex items-center gap-2">
               <span className="text-amber-400 font-semibold bg-emerald-900/80 px-2 py-0.5 rounded text-[11px]">
-                {currentRole === 'admin' ? 'පරිපාලක ප්‍රකාරය' : 'වෙළඳසැල් ප්‍රකාරය'}
+                වෙළඳසැල් ප්‍රකාරය
               </span>
               <button
                 onClick={() => onSwitchRole('customer')}
@@ -102,10 +129,12 @@ export const Navbar: React.FC<NavbarProps> = ({
               </button>
               <span className="text-emerald-800">·</span>
               <button
-                onClick={() => onSwitchRole('admin')}
-                className="text-emerald-300 hover:text-white transition-colors cursor-pointer text-[11px]"
+                onClick={onOpenAdminLogin}
+                className="text-emerald-300 hover:text-white transition-colors cursor-pointer text-[11px] flex items-center gap-1"
+                title="පාලක පුවරුව සඳහා ලොග් වන්න"
               >
-                පරිපාලක
+                <ShieldCheck className="w-3 h-3 text-emerald-400" />
+                <span>පරිපාලක පිවිසුම</span>
               </button>
             </div>
           )}
@@ -198,7 +227,7 @@ export const Navbar: React.FC<NavbarProps> = ({
 
             {/* Zone 3: 1 primary action / Role Dashboard */}
             <div className="flex items-center gap-3 shrink-0">
-              {currentRole === 'admin' ? (
+              {isAdminAuthenticated ? (
                 <button
                   onClick={() => setCurrentTab('admin')}
                   className={`px-4 py-2 text-xs font-semibold rounded-lg flex items-center gap-2 transition-all cursor-pointer ${
@@ -320,10 +349,10 @@ export const Navbar: React.FC<NavbarProps> = ({
                     </button>
                     <span>·</span>
                     <button
-                      onClick={() => { onSwitchRole('admin'); setMobileMenuOpen(false); }}
+                      onClick={() => { onOpenAdminLogin(); setMobileMenuOpen(false); }}
                       className="text-xs text-slate-600 hover:text-emerald-700 underline"
                     >
-                      පරිපාලක
+                      පරිපාලක පිවිසුම
                     </button>
                   </div>
                 </div>

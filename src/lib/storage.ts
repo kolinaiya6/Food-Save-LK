@@ -47,8 +47,8 @@ class AppStorage {
   private payments: StorePayment[] = [];
   private notifications: NotificationItem[] = [];
 
-  // Active current user session
-  private currentUser: UserProfile = INITIAL_USERS[0];
+  // Active current user session (Customer by default)
+  private currentUser: UserProfile = INITIAL_USERS[2];
 
   // Supabase sync states
   private isSyncingData: boolean = false;
@@ -125,10 +125,18 @@ class AppStorage {
       this.users = users ? JSON.parse(users) : INITIAL_USERS;
 
       const current = localStorage.getItem('fs_current_user');
+      const isAdminAuth = localStorage.getItem('fs_admin_authenticated') === 'true';
       if (current) {
-        this.currentUser = JSON.parse(current);
+        const parsed = JSON.parse(current);
+        if (parsed.role === 'admin' && !isAdminAuth) {
+          // If not authenticated as admin, reset to default customer
+          this.currentUser = this.users.find(u => u.role === 'customer') || INITIAL_USERS[2];
+          this.persist('fs_current_user', this.currentUser);
+        } else {
+          this.currentUser = parsed;
+        }
       } else {
-        this.currentUser = this.users[0]; // Admin by default
+        this.currentUser = this.users.find(u => u.role === 'customer') || INITIAL_USERS[2];
       }
     } catch (e) {
       console.error('Error loading local storage data:', e);
@@ -435,12 +443,64 @@ class AppStorage {
     }
   }
 
-  // --- Current User Management ---
+  // --- Current User & Admin Authentication Management ---
   public getCurrentUser(): UserProfile {
     return this.currentUser;
   }
 
+  public isAdminAuthenticated(): boolean {
+    return localStorage.getItem('fs_admin_authenticated') === 'true' && this.currentUser.role === 'admin';
+  }
+
+  public adminLogin(email: string, password: string): { success: boolean; message: string } {
+    const cleanEmail = email.trim().toLowerCase();
+    const cleanPass = password.trim();
+
+    if (cleanEmail === 'kolinaiya6@gmail.com' && cleanPass === '19880408@#') {
+      let admin = this.users.find(u => u.email.toLowerCase() === 'kolinaiya6@gmail.com');
+      if (!admin) {
+        admin = {
+          id: 'admin-kolinaiya',
+          email: 'kolinaiya6@gmail.com',
+          full_name: 'ප්‍රධාන පරිපාලක (kolinaiya6)',
+          phone: '0770001122',
+          role: 'admin',
+          city: 'කොළඹ',
+          is_active: true,
+          created_at: new Date().toISOString()
+        };
+        this.users.unshift(admin);
+        this.persist('fs_users', this.users);
+      }
+      this.currentUser = admin;
+      this.persist('fs_current_user', this.currentUser);
+      localStorage.setItem('fs_admin_authenticated', 'true');
+      this.addAuditLog('පරිපාලක පිවිසුම (Admin Login)', 'Auth', 'සාර්ථකව පිවිසෙන ලදී: kolinaiya6@gmail.com', admin.id);
+      this.notify();
+      return { success: true, message: 'සාර්ථකව ප්‍රවේශ විය!' };
+    }
+
+    return { 
+      success: false, 
+      message: 'විද්‍යුත් තැපෑල හෝ මුරපදය වැරදියි! (Username: kolinaiya6@gmail.com)' 
+    };
+  }
+
+  public adminLogout(): void {
+    localStorage.removeItem('fs_admin_authenticated');
+    const customer = this.users.find(u => u.role === 'customer') || INITIAL_USERS[2];
+    this.currentUser = customer;
+    this.persist('fs_current_user', this.currentUser);
+    this.addAuditLog('පරිපාලක පිටවීම (Admin Logout)', 'Auth', 'පරිපාලක ගිණුමෙන් ඉවත් විය: kolinaiya6@gmail.com');
+    this.notify();
+  }
+
   public switchRole(role: UserRole) {
+    if (role === 'admin' && !this.isAdminAuthenticated()) {
+      // Direct switch to admin blocked without login credentials
+      return;
+    }
+
     let target = this.users.find(u => u.role === role);
     if (!target) {
       target = {

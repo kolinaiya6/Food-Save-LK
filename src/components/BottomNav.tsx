@@ -1,6 +1,7 @@
 import React from 'react';
 import { Home, ShoppingBag, Ticket, BarChart2, ShieldCheck, Store } from 'lucide-react';
 import { UserRole } from '../types';
+import { storage } from '../lib/storage';
 
 interface BottomNavProps {
   currentTab: string;
@@ -66,7 +67,7 @@ export const BottomNav: React.FC<BottomNavProps> = ({
         <span>බලපෑම</span>
       </button>
 
-      {currentRole === 'admin' ? (
+      {currentRole === 'admin' && storage.isAdminAuthenticated() ? (
         <button
           onClick={() => setCurrentTab('admin')}
           className={`flex flex-col items-center py-1.5 px-2 text-[10px] font-medium transition-colors cursor-pointer ${

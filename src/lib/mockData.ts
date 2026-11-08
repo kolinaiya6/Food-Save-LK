@@ -896,8 +896,8 @@ export const INITIAL_REVIEWS: Review[] = [
 
 export const INITIAL_USERS: UserProfile[] = [
   {
-    id: 'admin-1',
-    email: 'admin@foodsavers.lk',
+    id: 'admin-kolinaiya',
+    email: 'kolinaiya6@gmail.com',
     full_name: 'ප්‍රධාන පරිපාලක (Super Admin)',
     phone: '0770001122',
     role: 'admin',

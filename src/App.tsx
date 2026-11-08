@@ -4,6 +4,7 @@
  */
 
 import React, { useState, useEffect } from 'react';
+import { ShieldCheck } from 'lucide-react';
 import { storage } from './lib/storage';
 import { FoodDeal, Reservation, Voucher, UserRole, Store } from './types';
 import { Navbar } from './components/Navbar';
@@ -17,6 +18,7 @@ import { StoreRegisterModal } from './components/StoreRegisterModal';
 import { SetupGuideModal } from './components/SetupGuideModal';
 import { MerchantDashboard } from './components/merchant/MerchantDashboard';
 import { AdminDashboard } from './components/admin/AdminDashboard';
+import { AdminLoginModal } from './components/AdminLoginModal';
 import { Footer } from './components/Footer';
 import { BottomNav } from './components/BottomNav';
 
@@ -54,6 +56,10 @@ export default function App() {
   const [activeVoucherModal, setActiveVoucherModal] = useState<Voucher | null>(null);
   const [storeRegisterModalOpen, setStoreRegisterModalOpen] = useState<boolean>(false);
   const [setupGuideModalOpen, setSetupGuideModalOpen] = useState<boolean>(false);
+  const [adminLoginModalOpen, setAdminLoginModalOpen] = useState<boolean>(false);
+
+  // Check whether Admin is authenticated with credentials
+  const isAdminAuth = storage.isAdminAuthenticated();
 
   // Default active merchant store for Merchant Portal
   const activeMerchantStore: Store = stores.find(s => s.status === 'approved') || stores[0];
@@ -90,7 +96,12 @@ export default function App() {
         setSelectedCity={setSelectedCity}
         cities={cities}
         currentRole={currentUser.role}
+        isAdminAuthenticated={isAdminAuth}
         onSwitchRole={(role: UserRole) => {
+          if (role === 'admin' && !isAdminAuth) {
+            setAdminLoginModalOpen(true);
+            return;
+          }
           storage.switchRole(role);
           if (role === 'admin') setCurrentTab('admin');
           else if (role === 'merchant') setCurrentTab('merchant');
@@ -99,6 +110,11 @@ export default function App() {
         onOpenStoreRegister={() => setStoreRegisterModalOpen(true)}
         onOpenSetupGuide={() => setSetupGuideModalOpen(true)}
         onOpenAuthModal={() => {}}
+        onOpenAdminLogin={() => setAdminLoginModalOpen(true)}
+        onAdminLogout={() => {
+          storage.adminLogout();
+          setCurrentTab('home');
+        }}
       />
 
       {/* Main Content Router */}
@@ -177,49 +193,67 @@ export default function App() {
           />
         )}
 
-        {/* Tab: ADMIN DASHBOARD (COMPLETE APP CONTROL) */}
+        {/* Tab: ADMIN DASHBOARD (COMPLETE APP CONTROL - PROTECTED) */}
         {currentTab === 'admin' && (
-          <AdminDashboard
-            stats={stats}
-            users={users}
-            stores={stores}
-            deals={deals}
-            categories={categories}
-            reservations={reservations}
-            vouchers={vouchers}
-            reviews={reviews}
-            cities={cities}
-            banners={banners}
-            auditLogs={auditLogs}
-            settings={settings}
-            onUpdateStore={(id, u) => storage.updateStore(id, u)}
-            onDeleteStore={(id) => storage.deleteStore(id)}
-            onAddStore={(s) => storage.addStore(s)}
-            onUpdateDeal={(id, u) => storage.updateDeal(id, u)}
-            onDeleteDeal={(id) => storage.deleteDeal(id)}
-            onAddDeal={(d) => storage.addDeal(d)}
-            onUpdateCategory={(id, u) => storage.updateCategory(id, u)}
-            onDeleteCategory={(id) => storage.deleteCategory(id)}
-            onAddCategory={(c) => storage.addCategory(c)}
-            onUpdateUser={(id, u) => storage.updateUser(id, u)}
-            onDeleteUser={(id) => storage.deleteUser(id)}
-            onAddUser={(u) => storage.addUser(u)}
-            onUpdateReservation={(id, u) => storage.updateReservation(id, u)}
-            onRevokeVoucher={(id) => storage.revokeVoucher(id)}
-            onUpdateReviewStatus={(id, s) => storage.updateReviewStatus(id, s)}
-            onDeleteReview={(id) => storage.deleteReview(id)}
-            onUpdateCity={(id, u) => storage.updateCity(id, u)}
-            onAddCity={(c) => storage.addCity(c)}
-            onDeleteCity={(id) => storage.deleteCity(id)}
-            onUpdateBanner={(id, u) => storage.updateBanner(id, u)}
-            onAddBanner={(b) => storage.addBanner(b)}
-            onDeleteBanner={(id) => storage.deleteBanner(id)}
-            onUpdateSettings={(s) => storage.updateSettings(s)}
-            onLogout={() => {
-              storage.switchRole('customer');
-              setCurrentTab('home');
-            }}
-          />
+          isAdminAuth ? (
+            <AdminDashboard
+              stats={stats}
+              users={users}
+              stores={stores}
+              deals={deals}
+              categories={categories}
+              reservations={reservations}
+              vouchers={vouchers}
+              reviews={reviews}
+              cities={cities}
+              banners={banners}
+              auditLogs={auditLogs}
+              settings={settings}
+              onUpdateStore={(id, u) => storage.updateStore(id, u)}
+              onDeleteStore={(id) => storage.deleteStore(id)}
+              onAddStore={(s) => storage.addStore(s)}
+              onUpdateDeal={(id, u) => storage.updateDeal(id, u)}
+              onDeleteDeal={(id) => storage.deleteDeal(id)}
+              onAddDeal={(d) => storage.addDeal(d)}
+              onUpdateCategory={(id, u) => storage.updateCategory(id, u)}
+              onDeleteCategory={(id) => storage.deleteCategory(id)}
+              onAddCategory={(c) => storage.addCategory(c)}
+              onUpdateUser={(id, u) => storage.updateUser(id, u)}
+              onDeleteUser={(id) => storage.deleteUser(id)}
+              onAddUser={(u) => storage.addUser(u)}
+              onUpdateReservation={(id, u) => storage.updateReservation(id, u)}
+              onRevokeVoucher={(id) => storage.revokeVoucher(id)}
+              onUpdateReviewStatus={(id, s) => storage.updateReviewStatus(id, s)}
+              onDeleteReview={(id) => storage.deleteReview(id)}
+              onUpdateCity={(id, u) => storage.updateCity(id, u)}
+              onAddCity={(c) => storage.addCity(c)}
+              onDeleteCity={(id) => storage.deleteCity(id)}
+              onUpdateBanner={(id, u) => storage.updateBanner(id, u)}
+              onAddBanner={(b) => storage.addBanner(b)}
+              onDeleteBanner={(id) => storage.deleteBanner(id)}
+              onUpdateSettings={(s) => storage.updateSettings(s)}
+              onLogout={() => {
+                storage.adminLogout();
+                setCurrentTab('home');
+              }}
+            />
+          ) : (
+            <div className="max-w-md mx-auto my-16 p-8 bg-white rounded-3xl border border-slate-200 shadow-xl text-center space-y-4">
+              <div className="w-16 h-16 rounded-2xl bg-amber-100 text-amber-700 mx-auto flex items-center justify-center">
+                <ShieldCheck className="w-8 h-8" />
+              </div>
+              <h2 className="text-xl font-bold text-slate-900">පාලක පුවරුව ආරක්‍ෂිතයි</h2>
+              <p className="text-xs text-slate-600 leading-relaxed">
+                පාලක පුවරුවට ප්‍රවේශ විය හැක්කේ බලයලත් ප්‍රධාන පරිපාලක (kolinaiya6@gmail.com) හට පමණි.
+              </p>
+              <button
+                onClick={() => setAdminLoginModalOpen(true)}
+                className="w-full py-3 bg-slate-900 hover:bg-slate-800 text-white font-bold rounded-xl text-sm transition-all shadow-md cursor-pointer"
+              >
+                පරිපාලක ලෙස ලොග් වන්න
+              </button>
+            </div>
+          )
         )}
 
       </div>
@@ -227,7 +261,13 @@ export default function App() {
       {/* Footer */}
       <Footer
         settings={settings}
-        onNavigate={(tab) => setCurrentTab(tab)}
+        onNavigate={(tab) => {
+          if (tab === 'admin' && !isAdminAuth) {
+            setAdminLoginModalOpen(true);
+            return;
+          }
+          setCurrentTab(tab);
+        }}
         onOpenStoreRegister={() => setStoreRegisterModalOpen(true)}
         onOpenSetupGuide={() => setSetupGuideModalOpen(true)}
       />
@@ -235,12 +275,27 @@ export default function App() {
       {/* Mobile Bottom Navigation */}
       <BottomNav
         currentTab={currentTab}
-        setCurrentTab={setCurrentTab}
+        setCurrentTab={(tab) => {
+          if (tab === 'admin' && !isAdminAuth) {
+            setAdminLoginModalOpen(true);
+            return;
+          }
+          setCurrentTab(tab);
+        }}
         currentRole={currentUser.role}
         voucherCount={vouchers.filter(v => !v.is_redeemed).length}
       />
 
       {/* Modals */}
+      <AdminLoginModal
+        isOpen={adminLoginModalOpen}
+        onClose={() => setAdminLoginModalOpen(false)}
+        onSuccess={() => {
+          setAdminLoginModalOpen(false);
+          setCurrentTab('admin');
+        }}
+      />
+
       <ReservationModal
         deal={selectedDealForReservation}
         onClose={() => setSelectedDealForReservation(null)}
