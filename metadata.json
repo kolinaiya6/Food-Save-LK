@@ -1,0 +1,6 @@
+{
+  "name": "කෑම සුරකින්නෝ - Food Savers Sri Lanka",
+  "description": "අඩු මිලට රසවත් කෑම අරන්, ආහාර අපතේ යාම වළක්වමු! ශ්‍රී ලංකාවේ ප්‍රමුඛතම අතිරික්ත ආහාර හුවමාරු වෙළඳපොළ.",
+  "requestFramePermissions": ["camera"],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
